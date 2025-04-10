@@ -1,33 +1,28 @@
-import unittest
-import pandas as pd
-from validation_service import Backtester
+from validation_service import Backtester, MetricCalculator, load_data, GraphDisplayer
 
-class DummyStrategy:
-    def should_enter(self, row):
-        return row['signal'] == 1
+class TrendStrategy:
+    def should_enter(self, signal, current_position):
+        if signal == 0:
+            return False
+        return signal != current_position
 
-class TestBacktester(unittest.TestCase):
+if __name__ == "__main__":
+    data = load_data("btc_signal_data.csv")
+    strategy = TrendStrategy()
+    bt = Backtester(strategy=strategy, data=data)
+    bt.run()
 
-    def setUp(self):
-        self.data = pd.DataFrame({
-            'timestamp': [1, 2, 3, 4, 5],
-            'price': [100, 101, 102, 103, 104],
-            'signal': [0, 1, 0, 1, 0]
-        })
-        self.strategy = DummyStrategy()
-        self.backtester = Backtester(strategy=self.strategy, data=self.data)
+    print("=== Backtest Trades ===")
+    # for trade in bt.trades:
+    #     print(trade)
 
-    def test_run_backtest(self):
-        self.backtester.run()
-        self.assertEqual(len(self.backtester.trades), 2)
-        self.assertIn('total_trades', self.backtester.results)
-        self.assertEqual(self.backtester.results['total_trades'], 2)
+    mc = MetricCalculator(trades=bt.trades, equity_curve=bt.equity)
+    metrics = mc.calculate()
 
-    def test_trade_structure(self):
-        self.backtester.run()
-        for trade in self.backtester.trades:
-            self.assertIn('entry', trade)
-            self.assertIn('time', trade)
+    print("\n=== Backtest Metrics ===")
+    for k, v in metrics.items():
+        print(f"{k}: {v}")
 
-if __name__ == '__main__':
-    unittest.main()
+    print(f"\nFinal Equity: {bt.results['final_equity']}")
+
+    GraphDisplayer(bt.results).show_equity_curve()

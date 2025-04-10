@@ -5,10 +5,10 @@ class GraphDisplayer:
         self.results = results
 
     def show_equity_curve(self):
-        equity = self.results.get("equity", [100, 105, 102, 110])
+        equity = self.results.get("equity_curve", [])
         plt.plot(equity)
         plt.title("Equity Curve")
-        plt.xlabel("Time")
+        plt.xlabel("Time Steps")
         plt.ylabel("Equity")
         plt.grid(True)
         plt.show()
