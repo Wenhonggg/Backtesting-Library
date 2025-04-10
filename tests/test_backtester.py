@@ -4,7 +4,10 @@ from validation_service import Backtester
 
 class DummyStrategy:
     def should_enter(self, row):
-        return row['signal'] == 1
+        return row['position'] == 1
+    
+    def should_exit(self,row):
+        return row['position'] == -1
 
 class TestBacktester(unittest.TestCase):
 
