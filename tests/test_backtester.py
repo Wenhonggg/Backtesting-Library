@@ -13,8 +13,8 @@ if __name__ == "__main__":
     bt.run()
 
     print("=== Backtest Trades ===")
-    # for trade in bt.trades:
-    #     print(trade)
+    for trade in bt.trades:
+        print(trade)
 
     mc = MetricCalculator(trades=bt.trades, equity_curve=bt.equity)
     metrics = mc.calculate()
